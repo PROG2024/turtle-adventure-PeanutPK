@@ -31,6 +31,7 @@ class Waypoint(TurtleGameElement):
     """
     Represent the waypoint to which the player will move.
     """
+
     def __init__(self, game: "TurtleAdventureGame"):
         super().__init__(game)
         self.__id1: int
@@ -306,8 +307,8 @@ class RandomWalkEnemy(Enemy):
     def create(self) -> None:
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
-        while (self.game.player.x - 10 < num_x < self.game.player.x + 10 or
-               self.game.player.y - 10 < num_y < self.game.player.y + 10):
+        while (self.game.player.x - 50 < num_x < self.game.player.x + 50 or
+               self.game.player.y - 50 < num_y < self.game.player.y + 50):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
         self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color)
@@ -359,8 +360,8 @@ class ChasingEnemy(Enemy):
     def create(self) -> None:
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
-        while (self.game.player.x - 10 < num_x < self.game.player.x + 10 or
-               self.game.player.y - 10 < num_y < self.game.player.y + 10):
+        while (self.game.player.x - 50 < num_x < self.game.player.x + 50 or
+               self.game.player.y - 50 < num_y < self.game.player.y + 50):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
         self.__id = self.canvas.create_rectangle(0, 0, 0, 0, fill=self.color)
@@ -374,11 +375,11 @@ class ChasingEnemy(Enemy):
         if abs(player_pos_x - self.x) > 80:
             speed_x = 3
         else:
-            speed_x = 2
+            speed_x = 1
         if abs(player_pos_y - self.y) > 80:
             speed_y = 3
         else:
-            speed_y = 2
+            speed_y = 1
 
         if player_pos_x > self.x:
             self.x += speed_x
@@ -474,12 +475,18 @@ class DrunkBouncyEnemy(Enemy):
         super().__init__(game, size, color)
         self.x_state = random.choice([self.left_state, self.right_state])
         self.y_state = random.choice([self.up_state, self.down_state])
+        self.speed = 1
         self.__id = None
 
     def create(self) -> None:
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
-        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill='red')
+        while (self.game.player.x - 50 < num_x < self.game.player.x + 50 or
+               self.game.player.y - 50 < num_y < self.game.player.y + 50):
+            num_x = random.randint(0, self.canvas.winfo_width())
+            num_y = random.randint(0, self.canvas.winfo_height())
+        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color,
+                                            outline='grey')
         self.x = num_x
         self.y = num_y
 
@@ -488,25 +495,24 @@ class DrunkBouncyEnemy(Enemy):
         self.y_state()
         if self.hits_player():
             self.game.game_over_lose()
-            self.delete()
 
     def left_state(self):
-        self.x -= 1
+        self.x -= self.speed
         if self.x <= 0:
             self.x_state = self.right_state
 
     def right_state(self):
-        self.x += 1
+        self.x += self.speed
         if self.x >= self.canvas.winfo_width():
             self.x_state = self.left_state
 
     def up_state(self):
-        self.y -= 1
+        self.y -= self.speed
         if self.y <= 0:
             self.y_state = self.down_state
 
     def down_state(self):
-        self.y += 1
+        self.y += self.speed
         if self.y >= self.canvas.winfo_height():
             self.y_state = self.up_state
 
@@ -555,13 +561,21 @@ class EnemyGenerator:
         return self.__level
 
     def create_enemy(self) -> None:
-        self.create_random_enemy()
+        for i in range(5):
+            self.create_random_enemy()
         self.game.after(600, self.create_chasing_enemy)
         self.create_fencing_enemy()
+        self.create_my_enemy()
         timer = 400
         for i in range(self.level):
             self.game.after(timer, self.create_random_enemy)
             timer += timer
+
+    def create_my_enemy(self) -> None:
+        for enemy_num in range(self.level):
+            new_enemy = DrunkBouncyEnemy(self.__game, 20, "White")
+            new_enemy.speed = int(self.level/3)
+            self.game.add_element(new_enemy)
 
     def create_random_enemy(self) -> None:
         """
