@@ -305,7 +305,8 @@ class RandomWalkEnemy(Enemy):
     def create(self) -> None:
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
-        while num_x == self.game.player.x or num_y == self.game.player.y:
+        while (self.game.player.x - 10 < num_x < self.game.player.x + 10 or
+               self.game.player.y - 10 < num_y < self.game.player.y + 10):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
         self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color)
