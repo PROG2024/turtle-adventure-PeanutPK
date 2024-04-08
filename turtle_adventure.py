@@ -31,7 +31,6 @@ class Waypoint(TurtleGameElement):
     """
     Represent the waypoint to which the player will move.
     """
-
     def __init__(self, game: "TurtleAdventureGame"):
         super().__init__(game)
         self.__id1: int
@@ -301,6 +300,8 @@ class RandomWalkEnemy(Enemy):
                  color: str):
         super().__init__(game, size, color)
         self.__id = None
+        self.waypoint = Waypoint(self.game)
+        self.generate_waypoint()
 
     def create(self) -> None:
         num_x = random.randint(0, self.canvas.winfo_width())
@@ -313,16 +314,22 @@ class RandomWalkEnemy(Enemy):
         self.x = num_x
         self.y = num_y
 
+    def generate_waypoint(self):
+        num_x = random.randint(0, self.canvas.winfo_width())
+        num_y = random.randint(0, self.canvas.winfo_height())
+        self.waypoint.activate(num_x, num_y)
+
     def update(self) -> None:
-        direction = random.choice(['left', 'right', 'up', 'down'])
-        if direction == 'left':
-            self.x -= 5
-        elif direction == 'right':
-            self.x += 5
-        elif direction == 'up':
-            self.y -= 5
-        elif direction == 'down':
-            self.y += 5
+        if self.x < self.waypoint.x:
+            self.x += 1
+        elif self.x > self.waypoint.x:
+            self.x -= 1
+        if self.y < self.waypoint.y:
+            self.y += 1
+        elif self.y > self.waypoint.y:
+            self.y -= 1
+        if self.x == self.waypoint.x and self.y == self.waypoint.y:
+            self.generate_waypoint()
         if self.hits_player():
             self.game.game_over_lose()
 
@@ -375,11 +382,11 @@ class ChasingEnemy(Enemy):
 
         if player_pos_x > self.x:
             self.x += speed_x
-        else:
+        elif player_pos_x < self.x:
             self.x -= speed_x
         if player_pos_y > self.y:
             self.y += speed_y
-        else:
+        elif player_pos_y < self.y:
             self.y -= speed_y
         if self.hits_player():
             self.game.game_over_lose()
@@ -578,7 +585,7 @@ class EnemyGenerator:
         """
         Create four fencing enemies on each corner.
         """
-        for i in range(self.level//2):
+        for i in range(self.level // 2):
             new_enemy = FencingEnemy(self.__game, 20, "red")
             new_enemy.speed = int(self.level / 2)
             new_enemy.distance_y += 50 * i

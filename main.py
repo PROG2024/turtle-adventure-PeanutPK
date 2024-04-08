@@ -15,6 +15,6 @@ if __name__ == "__main__":
     root.attributes('-topmost', True)
     root.geometry(f"{SCREEN_WIDTH}x{SCREEN_HEIGHT}")
     root.resizable(False, False)  # games usually have fixed window size
-    game = TurtleAdventureGame(root, SCREEN_WIDTH, SCREEN_HEIGHT, level=5)
+    game = TurtleAdventureGame(root, SCREEN_WIDTH, SCREEN_HEIGHT, level=10)
     game.start()
     root.mainloop()
