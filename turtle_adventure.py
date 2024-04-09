@@ -373,13 +373,13 @@ class ChasingEnemy(Enemy):
         player_pos_y = self.game.player.y
 
         if abs(player_pos_x - self.x) > 80:
+            speed_x = 5
+        else:
             speed_x = 3
-        else:
-            speed_x = 1
         if abs(player_pos_y - self.y) > 80:
-            speed_y = 3
+            speed_y = 5
         else:
-            speed_y = 1
+            speed_y = 3
 
         if player_pos_x > self.x:
             self.x += speed_x
@@ -416,7 +416,7 @@ class FencingEnemy(Enemy):
         self.__id = None
         self.__state = self.down
         self.enemy_num = 1
-        self.speed = 1
+        self.speed = 5
         self.distance_x, self.distance_y = 40, 40
         self.rad_x, self.rad_y = 40, 40
         self.finish_x = self.game.home.x
@@ -527,14 +527,6 @@ class DrunkBouncyEnemy(Enemy):
         self.canvas.delete(self.__id)
 
 
-# TODO
-# Complete the EnemyGenerator class by inserting code to generate enemies
-# based on the given game level; call TurtleAdventureGame's add_enemy() method
-# to add enemies to the game at certain points in time.
-#
-# Hint: the 'game' parameter is a tkinter's frame, so it's after()
-# method can be used to schedule some future events.
-
 class EnemyGenerator:
     """
     An EnemyGenerator instance is responsible for creating enemies of various
@@ -564,17 +556,17 @@ class EnemyGenerator:
         for i in range(5):
             self.create_random_enemy()
         self.game.after(600, self.create_chasing_enemy)
-        self.create_fencing_enemy()
         self.create_my_enemy()
         timer = 400
         for i in range(self.level):
             self.game.after(timer, self.create_random_enemy)
+            self.game.after(timer//2, self.create_fencing_enemy)
             timer += timer
 
     def create_my_enemy(self) -> None:
         for enemy_num in range(self.level):
             new_enemy = DrunkBouncyEnemy(self.__game, 20, "White")
-            new_enemy.speed = int(self.level/3)
+            new_enemy.speed = int(self.level / 3)
             self.game.add_element(new_enemy)
 
     def create_random_enemy(self) -> None:
@@ -599,11 +591,9 @@ class EnemyGenerator:
         """
         Create four fencing enemies on each corner.
         """
-        for i in range(self.level // 2):
-            new_enemy = FencingEnemy(self.__game, 20, "red")
-            new_enemy.speed = int(self.level / 2)
-            new_enemy.distance_y += 50 * i
-            self.game.add_element(new_enemy)
+        new_enemy = FencingEnemy(self.__game, 20, "red")
+        new_enemy.distance_y += 50 * i
+        self.game.add_element(new_enemy)
 
 
 class TurtleAdventureGame(Game):  # pylint: disable=too-many-ancestors
