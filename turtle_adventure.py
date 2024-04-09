@@ -592,7 +592,6 @@ class EnemyGenerator:
         Create four fencing enemies on each corner.
         """
         new_enemy = FencingEnemy(self.__game, 20, "red")
-        new_enemy.distance_y += 50 * i
         self.game.add_element(new_enemy)
 
 
