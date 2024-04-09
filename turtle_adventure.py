@@ -264,7 +264,8 @@ class DemoEnemy(Enemy):
         self.__id = None
 
     def create(self) -> None:
-        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color)
+        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color,
+                                            outline='black')
 
     def update(self) -> None:
         self.x += 1
@@ -305,7 +306,8 @@ class RandomWalkEnemy(Enemy):
                self.game.player.y - 50 < num_y < self.game.player.y + 50):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
-        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color)
+        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color,
+                                            outline='black')
         self.x = num_x
         self.y = num_y
 
@@ -358,7 +360,8 @@ class ChasingEnemy(Enemy):
                self.game.player.y - 50 < num_y < self.game.player.y + 50):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
-        self.__id = self.canvas.create_rectangle(0, 0, 0, 0, fill=self.color)
+        self.__id = self.canvas.create_rectangle(0, 0, 0, 0, fill=self.color,
+                                                 outline='black')
         self.x = num_x
         self.y = num_y
 
@@ -417,7 +420,8 @@ class FencingEnemy(Enemy):
         self.finish_y = self.game.home.y
 
     def create(self) -> None:
-        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color)
+        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color,
+                                            outline='black')
         self.x = self.game.home.x - self.distance_x
         self.y = self.game.home.y - self.distance_y
 
@@ -480,7 +484,7 @@ class DrunkBouncyEnemy(Enemy):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
         self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color,
-                                            outline='grey')
+                                            outline='lightgrey')
         self.x = num_x
         self.y = num_y
 
@@ -554,7 +558,7 @@ class EnemyGenerator:
         timer = 400
         for i in range(self.level):
             self.game.after(timer, self.create_random_enemy)
-            self.game.after(timer//2, self.create_fencing_enemy)
+            self.game.after(timer // 2, self.create_fencing_enemy)
             timer += timer
 
     def create_my_enemy(self) -> None:
