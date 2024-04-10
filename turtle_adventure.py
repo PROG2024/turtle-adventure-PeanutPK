@@ -2,9 +2,7 @@
 The turtle_adventure module maintains all classes related to the Turtle's
 adventure game.
 """
-import math
 import random
-import time
 from turtle import RawTurtle
 from gamelib import Game, GameElement
 
@@ -300,14 +298,17 @@ class RandomWalkEnemy(Enemy):
         self.generate_waypoint()
 
     def create(self) -> None:
+        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color)
+        if self.x == 0 and self.y == 0:
+            self.random_spawn()
+
+    def random_spawn(self):
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
         while (self.game.player.x - 100 < num_x < self.game.player.x + 100 or
                self.game.player.y - 100 < num_y < self.game.player.y + 100):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
-        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color,
-                                            outline='black')
         self.x = num_x
         self.y = num_y
 
@@ -354,14 +355,17 @@ class ChasingEnemy(Enemy):
         self.__id = None
 
     def create(self) -> None:
+        self.__id = self.canvas.create_rectangle(0, 0, 0, 0, fill=self.color)
+        if self.x == 0 and self.y == 0:
+            self.random_spawn()
+
+    def random_spawn(self):
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
         while (self.game.player.x - 100 < num_x < self.game.player.x + 100 or
                self.game.player.y - 100 < num_y < self.game.player.y + 100):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
-        self.__id = self.canvas.create_rectangle(0, 0, 0, 0, fill=self.color,
-                                                 outline='black')
         self.x = num_x
         self.y = num_y
 
@@ -473,43 +477,72 @@ class DrunkBouncyEnemy(Enemy):
         super().__init__(game, size, color)
         self.x_state = random.choice([self.left_state, self.right_state])
         self.y_state = random.choice([self.up_state, self.down_state])
-        self.speed = 1
+        self.current_x = self.x_state
+        self.current_y = self.y_state
+        self.__speed = 3
+        self.__dupe = True
         self.__id = None
 
     def create(self) -> None:
+        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color)
+        if self.x == 0 and self.y == 0:
+            self.random_spawn()
+
+    def random_spawn(self):
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
         while (self.game.player.x - 100 < num_x < self.game.player.x + 100 or
                self.game.player.y - 100 < num_y < self.game.player.y + 100):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
-        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color)
         self.x = num_x
         self.y = num_y
 
+    def create_dupe(self):
+        if self.__dupe:
+            new_enemy = DrunkBouncyEnemy(self.game, 10, "pink")
+            new_enemy.x = self.x
+            new_enemy.y = self.y
+            if self.x_state != self.current_x:
+                if self.current_y == self.up_state:
+                    new_enemy.y_state = new_enemy.down_state
+                else:
+                    new_enemy.y_state = new_enemy.up_state
+            if self.y_state != self.current_y:
+                if self.current_x == self.left_state:
+                    new_enemy.x_state = new_enemy.right_state
+                else:
+                    new_enemy.x_state = new_enemy.left_state
+            self.game.add_element(new_enemy)
+            self.__dupe = False  # Toggle the dupe status
+
     def update(self) -> None:
+        if self.x_state != self.current_x or self.y_state != self.current_y:
+            self.create_dupe()  # Only create a dupe when state changes
+            self.current_x = self.x_state
+            self.current_y = self.y_state
         self.x_state()
         self.y_state()
         if self.hits_player():
             self.game.game_over_lose()
 
     def left_state(self):
-        self.x -= self.speed
+        self.x -= self.__speed
         if self.x <= 0:
             self.x_state = self.right_state
 
     def right_state(self):
-        self.x += self.speed
+        self.x += self.__speed
         if self.x >= self.canvas.winfo_width():
             self.x_state = self.left_state
 
     def up_state(self):
-        self.y -= self.speed
+        self.y -= self.__speed
         if self.y <= 0:
             self.y_state = self.down_state
 
     def down_state(self):
-        self.y += self.speed
+        self.y += self.__speed
         if self.y >= self.canvas.winfo_height():
             self.y_state = self.up_state
 
@@ -562,8 +595,7 @@ class EnemyGenerator:
 
     def create_my_enemy(self) -> None:
         for enemy_num in range(self.level):
-            new_enemy = DrunkBouncyEnemy(self.__game, 20, "White")
-            new_enemy.speed = int(self.level / 3)
+            new_enemy = DrunkBouncyEnemy(self.__game, 10, "pink")
             self.game.add_element(new_enemy)
 
     def create_random_enemy(self) -> None:
