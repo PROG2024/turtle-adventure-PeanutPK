@@ -302,8 +302,8 @@ class RandomWalkEnemy(Enemy):
     def create(self) -> None:
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
-        while (self.game.player.x - 50 < num_x < self.game.player.x + 50 or
-               self.game.player.y - 50 < num_y < self.game.player.y + 50):
+        while (self.game.player.x - 100 < num_x < self.game.player.x + 100 or
+               self.game.player.y - 100 < num_y < self.game.player.y + 100):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
         self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color,
@@ -356,8 +356,8 @@ class ChasingEnemy(Enemy):
     def create(self) -> None:
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
-        while (self.game.player.x - 50 < num_x < self.game.player.x + 50 or
-               self.game.player.y - 50 < num_y < self.game.player.y + 50):
+        while (self.game.player.x - 100 < num_x < self.game.player.x + 100 or
+               self.game.player.y - 100 < num_y < self.game.player.y + 100):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
         self.__id = self.canvas.create_rectangle(0, 0, 0, 0, fill=self.color,
@@ -372,11 +372,11 @@ class ChasingEnemy(Enemy):
         if abs(player_pos_x - self.x) > 80:
             speed_x = 5
         else:
-            speed_x = 3
+            speed_x = 2
         if abs(player_pos_y - self.y) > 80:
             speed_y = 5
         else:
-            speed_y = 3
+            speed_y = 2
 
         if player_pos_x > self.x:
             self.x += speed_x
@@ -479,12 +479,11 @@ class DrunkBouncyEnemy(Enemy):
     def create(self) -> None:
         num_x = random.randint(0, self.canvas.winfo_width())
         num_y = random.randint(0, self.canvas.winfo_height())
-        while (self.game.player.x - 50 < num_x < self.game.player.x + 50 or
-               self.game.player.y - 50 < num_y < self.game.player.y + 50):
+        while (self.game.player.x - 100 < num_x < self.game.player.x + 100 or
+               self.game.player.y - 100 < num_y < self.game.player.y + 100):
             num_x = random.randint(0, self.canvas.winfo_width())
             num_y = random.randint(0, self.canvas.winfo_height())
-        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color,
-                                            outline='lightgrey')
+        self.__id = self.canvas.create_oval(0, 0, 0, 0, fill=self.color)
         self.x = num_x
         self.y = num_y
 
