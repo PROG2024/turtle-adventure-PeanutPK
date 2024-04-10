@@ -3,6 +3,7 @@ The turtle_adventure module maintains all classes related to the Turtle's
 adventure game.
 """
 import random
+import time
 from turtle import RawTurtle
 from gamelib import Game, GameElement
 
@@ -477,10 +478,7 @@ class DrunkBouncyEnemy(Enemy):
         super().__init__(game, size, color)
         self.x_state = random.choice([self.left_state, self.right_state])
         self.y_state = random.choice([self.up_state, self.down_state])
-        self.current_x = self.x_state
-        self.current_y = self.y_state
-        self.__speed = 3
-        self.__dupe = True
+        self.speed = 3
         self.__id = None
 
     def create(self) -> None:
@@ -498,53 +496,57 @@ class DrunkBouncyEnemy(Enemy):
         self.x = num_x
         self.y = num_y
 
-    def create_dupe(self):
-        if self.__dupe:
-            new_enemy = DrunkBouncyEnemy(self.game, 10, "pink")
-            new_enemy.x = self.x
+    def create_dupe(self, x_state, y_state):
+        new_enemy = DrunkBouncyEnemy(self.game, 10, "pink")
+        new_enemy.x_state = eval(f"new_enemy.{x_state}")
+        new_enemy.y_state = eval(f"new_enemy.{y_state}")
+        if self.x <= 0:
+            new_enemy.x = 1
             new_enemy.y = self.y
-            if self.x_state != self.current_x:
-                if self.current_y == self.up_state:
-                    new_enemy.y_state = new_enemy.down_state
-                else:
-                    new_enemy.y_state = new_enemy.up_state
-            if self.y_state != self.current_y:
-                if self.current_x == self.left_state:
-                    new_enemy.x_state = new_enemy.right_state
-                else:
-                    new_enemy.x_state = new_enemy.left_state
-            self.game.add_element(new_enemy)
-            self.__dupe = False  # Toggle the dupe status
+        elif self.x >= self.canvas.winfo_width():
+            new_enemy.x = self.canvas.winfo_width() - 1
+            new_enemy.y = self.y
+        elif self.y <= 0:
+            new_enemy.y = 1
+            new_enemy.x = self.x
+        elif self.y >= self.canvas.winfo_height():
+            new_enemy.y = self.canvas.winfo_height() - 1
+            new_enemy.x = self.x
+        self.game.add_element(new_enemy)
 
     def update(self) -> None:
-        if self.x_state != self.current_x or self.y_state != self.current_y:
-            self.create_dupe()  # Only create a dupe when state changes
-            self.current_x = self.x_state
-            self.current_y = self.y_state
         self.x_state()
         self.y_state()
         if self.hits_player():
             self.game.game_over_lose()
 
     def left_state(self):
-        self.x -= self.__speed
+        self.x -= self.speed
         if self.x <= 0:
-            self.x_state = self.right_state
+            self.create_dupe("right_state", "up_state")
+            self.create_dupe("right_state", "down_state")
+            self.game.delete_element(self)
 
     def right_state(self):
-        self.x += self.__speed
+        self.x += self.speed
         if self.x >= self.canvas.winfo_width():
-            self.x_state = self.left_state
+            self.create_dupe("left_state", "up_state")
+            self.create_dupe("left_state", "down_state")
+            self.game.delete_element(self)
 
     def up_state(self):
-        self.y -= self.__speed
+        self.y -= self.speed
         if self.y <= 0:
-            self.y_state = self.down_state
+            self.create_dupe("left_state", "down_state")
+            self.create_dupe("right_state", "down_state")
+            self.game.delete_element(self)
 
     def down_state(self):
-        self.y += self.__speed
+        self.y += self.speed
         if self.y >= self.canvas.winfo_height():
-            self.y_state = self.up_state
+            self.create_dupe("left_state", "up_state")
+            self.create_dupe("right_state", "up_state")
+            self.game.delete_element(self)
 
     def render(self) -> None:
         self.canvas.coords(self.__id,
@@ -680,7 +682,7 @@ class TurtleAdventureGame(Game):  # pylint: disable=too-many-ancestors
         font = ("Arial", 36, "bold")
         self.canvas.create_text(self.screen_width / 2,
                                 self.screen_height / 2,
-                                text="You Win",
+                                text="You Win Level " + str(self.level),
                                 font=font,
                                 fill="green")
 
@@ -695,3 +697,4 @@ class TurtleAdventureGame(Game):  # pylint: disable=too-many-ancestors
                                 text="You Lose",
                                 font=font,
                                 fill="red")
+        self.level = 0
