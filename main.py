@@ -12,8 +12,11 @@ SCREEN_HEIGHT: Final = 500
 if __name__ == "__main__":
     root = tk.Tk()
     root.title("Turtle's Adventure")
+    root.attributes('-topmost', True)
     root.geometry(f"{SCREEN_WIDTH}x{SCREEN_HEIGHT}")
-    root.resizable(False, False) # games usually have fixed window size
-    game = TurtleAdventureGame(root, SCREEN_WIDTH, SCREEN_HEIGHT, level=1)
+    root.resizable(False, False)  # games usually have fixed window size
+    # above Level 5 it is very hard
+    game = TurtleAdventureGame(root, SCREEN_WIDTH, SCREEN_HEIGHT, level=5)
     game.start()
+    print(game.player.speed)
     root.mainloop()
